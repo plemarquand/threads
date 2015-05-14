@@ -1,0 +1,161 @@
+<?xml version="1.0"?>
+<project name="ThreadVis" default="launchDebugApp" basedir=".">
+	
+	<!-- ===================================================== --> 
+    <!-- APPLICATION VARIABLES - CHANGE EACH PROJECT           --> 
+    <!-- ===================================================== --> 
+	
+	<!-- The name of your project in FDT -->
+	<property name="PROJECT_NAME" value="Threads" />
+	
+	<!-- The name you want the compiled Bar file to be without the .bar -->
+	<property name="BAR_NAME" value="Threads"/>
+	
+	<!-- The name of your Air Application Descriptor File without the -app.xml -->
+	<property name="APP_DESC_NAME" value="Threads"/>
+	
+	<!-- The name of the main SWF file without the .swf -->
+	<property name="SWF_NAME" value="Threads"/>
+	
+	<!-- The location of the src directory. Usually just src. -->
+	<property name="SRC_DIRECTORY" value="src" />
+	
+	<!-- The location of the bin directory. Usually just bin. -->
+	<property name="BIN_DIRECTORY" value="bin" />
+	
+	<!-- ===================================================== --> 
+    <!-- DEVICE VARIABLES - SET ONCE FOR YOUR DEVICE           --> 
+    <!-- ===================================================== -->
+    
+    <!-- The IP Address of the Device. -->
+	<property name="DEVICE_IP" value="169.254.0.1"/>
+	
+	<!-- The Password of the Device. -->
+	<property name="DEVICE_PASSWORD" value="1234"/>
+	
+	<!-- The IP Address of the Host Machine to Debug on. -->
+	<property name="HOST_DEBUG_IP" value="169.254.0.2"/>
+	
+	
+	
+	<!-- ===================================================== --> 
+    <!-- SYSTEM VARIABLES - SET ONCE FOR YOUR SYSTEM           --> 
+    <!-- ===================================================== -->
+	
+	<!-- The location of the Blackberry Tablet SDK -->
+    <property name="SDK_HOME" value="/_FLASH/Work/deckard/as3/build/sdk"/>
+    
+    <!-- The location of the BarAir.jar file for compiling Bar Files. -->
+	<property name="AIR_PACKAGER" value="${SDK_HOME}/lib/BarAir.jar"/>
+	
+	
+	
+	
+	
+	
+    
+    
+    
+    <!-- ===================================================== --> 
+    <!-- RELEASE TARGETS                                       --> 
+    <!-- ===================================================== --> 
+    
+    <!-- Will Generate the Bar File in Release Mode -->
+    <target name="generateBarRelease">
+  		<java jar="${AIR_PACKAGER}" fork="true" failonerror="true" dir="${BIN_DIRECTORY}">
+    		<arg value="-package"/>
+    		<arg value="-target" />
+    		<arg value="bar" />
+    		<arg value="${BAR_NAME}_RELEASE.bar"/>
+    		<arg value="${APP_DESC_NAME}-app.xml"/>
+    		<arg value="${SWF_NAME}.swf" />
+    		<arg value="blackberry-tablet.xml" />
+    		<arg value="locale" />
+  		</java>
+	</target>
+	
+	
+	<!-- Installs the Release Application on the Device -->
+	<target name="installReleaseApp">
+		<java jar="${AIR_PACKAGER}" fork="true" failonerror="true">
+			<arg value="-installApp"/>
+			<arg value="-device" />
+			<arg value="${DEVICE_IP}"/>
+			<arg value="-password"/>
+			<arg value="${DEVICE_PASSWORD}"/>
+			<arg value="${BIN_DIRECTORY}/${BAR_NAME}_RELEASE.bar" />
+		</java>
+	</target>
+	
+	<!-- Launches the Release Application on the Device -->
+	<target name="launchReleaseApp" depends="installReleaseApp">
+		<java jar="${AIR_PACKAGER}" fork="true" failonerror="true">
+			<arg value="-launchApp"/>
+			<arg value="-device" />
+			<arg value="${DEVICE_IP}"/>
+			<arg value="-password"/>
+			<arg value="${DEVICE_PASSWORD}"/>
+			<arg value="${BIN_DIRECTORY}/${BAR_NAME}_RELEASE.bar" />
+		</java>
+	</target>
+    
+    <!-- ===================================================== --> 
+    <!-- DEBUG TARGETS                                         --> 
+    <!-- ===================================================== --> 
+    
+    
+    <!-- Will Generate the Bar File in Debug Mode -->
+    <target name="generateBarDebug">
+  		<java jar="${AIR_PACKAGER}" fork="true" failonerror="true" dir="${BIN_DIRECTORY}">
+    		<arg value="-package"/>
+    		<arg value="-target" />
+    		<arg value="bar-debug" />
+    		<arg value="${BAR_NAME}_DEBUG.bar"/>
+    		<arg value="${APP_DESC_NAME}-app.xml"/>
+    		<arg value="${SWF_NAME}.swf" />
+    		<arg value="blackberry-tablet.xml" />
+    		<arg value="locale" />
+  		</java>
+	</target>
+	
+	<!-- Installs the Debug Application on the Device -->
+	<target name="installDebugApp" depends="generateBarDebug">
+		<java jar="${AIR_PACKAGER}" fork="true" failonerror="true">
+			<arg value="-installApp"/>
+			<arg value="-device" />
+			<arg value="${DEVICE_IP}"/>
+			<arg value="-password"/>
+			<arg value="${DEVICE_PASSWORD}"/>
+			<arg value="-connect"/>
+			<arg value="${HOST_DEBUG_IP}"/>
+			<arg value="${BIN_DIRECTORY}/${BAR_NAME}_DEBUG.bar" />
+		</java>
+	</target>
+	
+	<!-- Launches the Debug Application on the Device -->
+	<target name="launchDebugApp" depends="installDebugApp">
+		<java jar="${AIR_PACKAGER}" fork="true" failonerror="true">
+			<arg value="-launchApp"/>
+			<arg value="-device" />
+			<arg value="${DEVICE_IP}"/>
+			<arg value="-password"/>
+			<arg value="${DEVICE_PASSWORD}"/>
+			<arg value="-connect"/>
+			<arg value="${HOST_DEBUG_IP}"/>
+			<arg value="${BIN_DIRECTORY}/${BAR_NAME}_DEBUG.bar" />
+		</java>
+		<antcall target="startDebugger"/>
+	</target>
+	
+	
+	<!-- ===================================================== --> 
+    <!-- HELPER TARGETS                                        --> 
+    <!-- ===================================================== --> 
+	
+	<!-- Will Start the Debugger in FDT -->
+	<target name="startDebugger">
+		<fdt.startDebugger projectname="${PROJECT_NAME}" switchperspectiveonbreakpoint="false"/>
+	</target>
+    
+</project>
+
